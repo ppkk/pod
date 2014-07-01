@@ -2,14 +2,12 @@ function show_solution(x)
     rows = sqrt(length(x));
     x_mat = vec2mat(x, rows, rows);
     
-    max(max(x_mat))
+    %fprintf('maximal value %d\n', max(max(x_mat)));
     
     x_mat = smooth(x_mat);
     x_mat = smooth(x_mat);
     x_mat = smooth(x_mat);
-    imagesc(x_mat);
-    
-
+    imagesc(x_mat);   
 end
 
 function x = smooth(a)
