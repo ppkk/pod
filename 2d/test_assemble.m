@@ -1,6 +1,6 @@
 function test_assemble
     n_blocks = 4;
-    n_per_block = 20;
+    n_per_block = 60;
     coef_mat = ones(n_blocks);
     %coef_mat(2,2) = 5;
     %coef_mat(3,4) = 5;
@@ -18,6 +18,7 @@ function test_assemble
 %    imagesc(A);
 %    full(A)
     %plot(f);
+    %spy(A)
     x = A\f;
     show_solution(x);
 end

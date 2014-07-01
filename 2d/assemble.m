@@ -1,19 +1,33 @@
 function [A, f] = assemble(coef_mat, load_mat, elems_per_block)
-    %assert(size(coef_mat) == size(load_mat));
-    
     n_blocks = length(coef_mat);
     h = 1/(n_blocks * elems_per_block);
-    ndofs = (n_blocks * elems_per_block - 1)^2;
+    dofs_per_row = n_blocks * elems_per_block - 1;
+    ndofs = (dofs_per_row)^2;
     fprintf('assembling problem with %d dofs\n', ndofs)
 
     local_stiffness = 1/6 * [4, -1, -1, -2;
                              -1, 4, -2, -1;
                              -1, -2, 4, -1;
-                             -2, -1, -1, 4];
-                         
+                             -2, -1, -1, 4];                         
     local_rhs = h*h/4;
-
-    A = sparse(ndofs, ndofs);
+    
+    ndof_neighbours = 9;
+    
+    rows = ones(1, ndof_neighbours*ndofs);
+    cols = ones(1, ndof_neighbours*ndofs);
+    vals = zeros(1, ndof_neighbours*ndofs);
+    
+    offsets = zeros(2*dofs_per_row + 3, 1);
+    offsets(1) = 0;
+    offsets(2) = 1;
+    offsets(3) = 2;
+    offsets(dofs_per_row + 1) = 3;
+    offsets(dofs_per_row + 2) = 4;
+    offsets(dofs_per_row + 3) = 5;
+    offsets(2 * dofs_per_row + 1) = 6;
+    offsets(2 * dofs_per_row + 2) = 7;
+    offsets(2 * dofs_per_row + 3) = 8;
+    
     f = zeros(ndofs, 1);
     element_idx = 1;
     %i rade, j sloupec
@@ -46,12 +60,16 @@ function [A, f] = assemble(coef_mat, load_mat, elems_per_block)
                     
                     for i = 1:4
                         if global_indices(i) >= 0
+                            row = global_indices(i);
                             for j = 1:4
                                  if global_indices(j) >= 0
-                                    % todo: pomale, ridka matice by se mela sestavovat pomoci CRC formatu    
-%                                    fprintf('element %d, global indices %d, %d, added %d\n', element_idx, global_indices(i), global_indices(j),  coef * local_stiffness(i,j))
-                                    A(global_indices(i), global_indices(j)) = A(global_indices(i), global_indices(j)) + ...
-                                          coef * local_stiffness(i,j);
+                                     col = global_indices(j);
+                                     offset_start = (row - 1) * ndof_neighbours + 1;
+                                     offset = offset_start + offsets(col - row + dofs_per_row + 2);
+                                     rows(offset) = row;
+                                     cols(offset) = col;
+                                     vals(offset) = vals(offset) + coef * local_stiffness(i,j);
+                                     
                                  end
                             end
                            
@@ -66,4 +84,5 @@ function [A, f] = assemble(coef_mat, load_mat, elems_per_block)
         end
     end
 
+    A = sparse(rows, cols, vals);
 end

@@ -1,6 +1,6 @@
 function extract_modes
     n_blocks = 4;
-    n_per_block = 10;
+    n_per_block = 20;
     
     dofs = (n_blocks * n_per_block - 1)^2;
 %    Q = zeros(dofs, n_blocks^2);
@@ -24,15 +24,14 @@ function extract_modes
     
     c = Q*Q';
     
-    [vec, lambda] = eig(c);
+    num_modes = 30;
+    [vec, lambda] = eigs(c, num_modes);
     lambda = diag(lambda);
-    num_eigen = length(lambda);
-    lambda_range = round(0.97*num_eigen):num_eigen;
-    for i = 0:40
+    for i = 1:num_modes
         subplot(1, 2, 1)
-        semilogy(lambda_range, lambda(lambda_range), '*r', num_eigen - i, lambda(num_eigen - i), '*b');
+        semilogy(1:num_modes, lambda, '*r', i, lambda(i), '*b');
         subplot(1, 2, 2)
-        show_solution(vec(:, num_eigen - i));
+        show_solution(vec(:, i));
         waitforbuttonpress;
             
     end
