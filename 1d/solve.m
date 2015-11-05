@@ -1,4 +1,4 @@
-function solutions = solve(n_space, n_time, initial, B)
+function solutions = solve(n_space, n_time, initial, B, new_load)
     lambda = 0.01;
     time_total = 30;
     dt = time_total / n_time;
@@ -15,7 +15,12 @@ function solutions = solve(n_space, n_time, initial, B)
     M = B'*(M/dt)*B;
     for(m=2:n_time)
         time = time + dt;
-        rhs(1) = lambda*derivative(time);
+        if new_load
+            derivative = derivative_new(time);
+        else
+            derivative = derivative_orig(time);
+        end
+        rhs(1) = lambda*derivative;
         q = B'*rhs;
         solutions(:, m) = K\ ( M * solutions(:, m-1) + q);
     end
@@ -23,11 +28,19 @@ function solutions = solve(n_space, n_time, initial, B)
     solutions = solutions(:, [1,10*(1:30)]);
 end
 
-function q = derivative(time)
+function q = derivative_orig(time)
     if(time <= 10)
         q = 1;
     else
         q = 0;
+    end
+end
+
+function q = derivative_new(time)
+    if(time <= 20)
+        q = time/20;
+    else
+        q = (time-30)/5;
     end
 end
 

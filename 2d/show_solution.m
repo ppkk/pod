@@ -1,3 +1,9 @@
+%----------------------------------------------------------------------
+% simple test for model order reduction in 2D
+%             Pavel Kůs 
+%                2014
+%----------------------------------------------------------------------
+
 function show_solution(x)
     rows = sqrt(length(x));
     x_mat = vec2mat(x, rows, rows);

@@ -1,3 +1,9 @@
+%----------------------------------------------------------------------
+% simple test for model order reduction in 2D
+%             Pavel Kůs 
+%                2014
+%----------------------------------------------------------------------
+
 function [A, f] = assemble(coef_mat, load_mat, elems_per_block)
     n_blocks = length(coef_mat);
     h = 1/(n_blocks * elems_per_block);
@@ -61,10 +67,10 @@ function [A, f] = assemble(coef_mat, load_mat, elems_per_block)
                     for i = 1:4
                         if global_indices(i) >= 0
                             row = global_indices(i);
+                            offset_start = (row - 1) * ndof_neighbours + 1;
                             for j = 1:4
                                  if global_indices(j) >= 0
                                      col = global_indices(j);
-                                     offset_start = (row - 1) * ndof_neighbours + 1;
                                      offset = offset_start + offsets(col - row + dofs_per_row + 2);
                                      rows(offset) = row;
                                      cols(offset) = col;
